@@ -13,16 +13,27 @@ console.log("🔑 JWT_SECRET présent =", !!process.env.JWT_SECRET);
 console.log("🔑 PORT =", process.env.PORT);
 
 // ─── Middlewares ──────────────────────────────────────────────────────────────
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
+// ─── Routes utilisateurs (app Flutter) ───────────────────────────────────────
 app.use('/api/auth',          require('./routes/auth'));
 app.use('/api/users',         require('./routes/user.routes'));
 app.use('/api/activities',    require('./routes/activity.routes'));
 app.use('/api/moods',         require('./routes/mood.routes'));
 app.use('/api/notifications', require('./routes/notification.routes'));
+
+// ─── Routes admin ─────────────────────────────────────────────────────────────
+app.use('/api/dashboard',          require('./routes/dashboard'));
+app.use('/api/services',           require('./routes/services'));
+app.use('/api/demandes',           require('./routes/demandes'));
+app.use('/api/admin/notifications',require('./routes/adminnotification'));
+app.use('/api/stats',              require('./routes/stats'));
 
 // ─── Route test ───────────────────────────────────────────────────────────────
 app.get('/', (req, res) => res.json({ message: '🎉 WeJoy API is running !' }));
@@ -39,7 +50,7 @@ mongoose.connect(process.env.MONGO_URI)
   .catch(err => console.log("❌ Erreur MongoDB :", err));
 
 // ─── Démarrage serveur ────────────────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 const server = app.listen(PORT, () => {
   console.log(`🚀 Serveur lancé sur http://localhost:${PORT}`);

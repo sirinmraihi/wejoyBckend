@@ -40,22 +40,29 @@ const UserSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Activity',
   }],
+
+  // ✅ NOUVEAU
+  isBlocked: {
+    type: Boolean,
+    default: false,
+  },
+
 }, {
   timestamps: true,
 });
 
-// ✅ Corrigé — sans next
+// Corrigé — sans next
 UserSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
   this.password = await bcrypt.hash(this.password, 10);
 });
 
-// ✅ Comparer le mot de passe
+// Comparer le mot de passe
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   return bcrypt.compare(candidatePassword, this.password);
 };
 
-// ✅ Formate pour Flutter
+// Formate pour Flutter
 UserSchema.methods.toFlutter = function () {
   return {
     _id: this._id,
@@ -69,6 +76,7 @@ UserSchema.methods.toFlutter = function () {
     badgeCount: this.badges?.length ?? 0,
     interests: this.interests,
     avatarUrl: this.avatarUrl,
+    isBlocked: this.isBlocked,  // ✅ NOUVEAU
   };
 };
 
